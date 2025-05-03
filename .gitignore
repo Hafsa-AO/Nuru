@@ -1,0 +1,8 @@
+.env
+node_modules/
+# Ignore frontend files
+/frontendNS/node_modules/
+/frontendNS/package-lock.json
+/frontendNS/package.json
+
+

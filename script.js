@@ -111,6 +111,14 @@ document.addEventListener('DOMContentLoaded', () => {
         openModal('checkout-modal');
     });
 
+    // Set up the backend URL dynamically based on the environment (local or production)
+    const backendUrl = window.location.hostname === 'localhost'
+      ? 'http://localhost:3000'
+      : 'https://immense-coast-77511-1be7e20913d5.herokuapp.com';
+
+    const paymentUrl = `${backendUrl}/create-payment`;
+    const contactUrl = `${backendUrl}/contact`;
+
     // Stripe setup
     const stripe = Stripe('pk_live_51RHr5g00vYTXWJ1EIq9khvyn8KLs0JivRf2leeY8Nw3UJ7bmij0ZSbXIWpRDwbvY1pVflP4X939Mupeu2rmdpYBC00V5qDoHV1');
     const elements = stripe.elements();
@@ -137,7 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            const response = await fetch('http://localhost:3000/create-payment', {
+            const response = await fetch(paymentUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -147,7 +155,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     address: fullAddress,
                     cart,
                     amount: Math.round(totalAmount * 100)
-
                 })
             });
 
@@ -190,7 +197,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             try {
-                const response = await fetch('http://localhost:3000/contact', {
+                const response = await fetch(contactUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ name, email, message }),
@@ -212,9 +219,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    //  Step Navigation Buttons
+    // Step Navigation Buttons
     document.querySelectorAll('.next-step').forEach(btn => btn.addEventListener('click', nextStep));
     document.querySelectorAll('.prev-step').forEach(btn => btn.addEventListener('click', prevStep));
-
-
 });

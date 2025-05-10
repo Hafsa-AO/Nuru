@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NuruSoaps - Handmade Soaps</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <header class="navbar">
+        <h1>NuruSoaps</h1>
+        <nav>
+            <a href="#home">Home</a>
+            <a href="#features">Why Us</a>
+            <a href="#products">Shop</a>
+            <a href="#contact">Contact</a>
+        </nav>
+        <!-- Cart Icon -->
+        <a href="javascript:void(0);" class="cart-icon" id="cart-btn">
+            <i class="fas fa-shopping-cart"></i>
+            <span id="cart-count">0</span>
+        </a>
+    </header>
+
+    <section id="home" class="hero-banner">
+        <div class="hero-text">
+            <h1>Natural. Handmade. Beautiful.</h1>
+            <p>Nurtured by Nature, Crafted by Hand</p>
+            <a href="#products" class="btn">Shop Now</a>
+        </div>
+        <div class="hero-image">
+            <img src="Images/bannerpic.jpg" alt="NuruSoaps Products">
+        </div>
+    </section>
+
+    <section id="features" class="features">
+        <h2>Why Choose NuruSoaps?</h2>
+        <p>Choose Nuru Soaps for handcrafted beauty, inspired by centuries-old East African secrets.</p>
+        <p>Eco-friendly, cruelty-free, and crafted with the finest natural ingredients.</p>
+    </section>
+    <section id="sale-banner" class="sale-banner">
+        <h2>🔥 Spring Sale! Get 20% Off All Soaps 🔥</h2>
+        <p>Discount applied automatically at checkout</p>
+    </section>
+    
+
+    <section id="products" class="products">
+        <h2>Our Bestsellers</h2>
+        <div class="product-list">
+            <!-- Product 1 -->
+            <div class="product">
+                <img src="Images/softnsupplequality.jpg" alt="Soft & Supple">
+                <div class="product-info">
+                    <h3>Soft & Supple</h3>
+                    <p>Gentle yet powerful, our Qasil Soap Bar is crafted with a nourishing blend of oils and essential oils, cleansing and soothing the skin while maintaining its natural moisture balance for a soft, smooth complexion.</p>
+                    <span>£6.99</span>
+                    <button class="btn add-to-cart" data-product="Soft & Supple" data-price="6.99">Add to Basket</button>
+                    <button class="btn-benefits" data-modal="softSuppleModal">View Benefits</button>
+                </div>
+                <div id="softSuppleModal" class="modal">
+                    <div class="modal-content">
+                        <span class="close" onclick="closeModal('softSuppleModal')">&times;</span>
+                        <h4>Soft & Supple Benefits:</h4>
+                        <ul>
+                            <li><i class="fas fa-leaf"></i> Deep cleanses and purifies skin</li>
+                            <li><i class="fas fa-sun"></i> Visibly brightens skin by removing impurities</li>
+                            <li><i class="fas fa-heart"></i> Promotes a healthy glow</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product 2 -->
+            <div class="product">
+                <img src="Images/glownbeholdquality.jpg" alt="Glow and Behold">
+                <div class="product-info">
+                    <h3>Glow and Behold</h3>
+                    <p>Unveil your natural radiance with Glow and Behold - a skin-brightening bar infused with turmeric, working to even out skin tone, reduce dark spots, and give you a luminous, healthy glow.</p>
+                    <span>£6.99</span>
+                    <button class="btn add-to-cart" data-product="Glow and Behold" data-price="6.99">Add to Basket</button>
+                    <button class="btn-benefits" data-modal="glowBeholdModal">View Benefits</button>
+                </div>
+                <div id="glowBeholdModal" class="modal">
+                    <div class="modal-content">
+                        <span class="close" onclick="closeModal('glowBeholdModal')">&times;</span>
+                        <h4>Glow and Behold Benefits:</h4>
+                        <ul>
+                            <li><i class="fas fa-sun"></i> Brightens and evens skin tone</li>
+                            <li><i class="fas fa-paint-brush"></i> Reduces dullness</li>
+                            <li><i class="fas fa-water"></i> Hydrates and refreshes</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product 3 -->
+            <div class="product">
+                <img src="Images/naturesbotoxquality.jpg" alt="Nature's Botox">
+                <div class="product-info">
+                    <h3>Nature's Botox</h3>
+                    <p>Firm, smooth, and glow with Nature's Botox - a rejuvenating bar infused with hibiscus and rose, designed to promote youthful skin while deeply hydrating and restoring its natural elasticity.</p>
+                    <span>£6.99</span>
+                    <button class="btn add-to-cart" data-product="Nature's Botox" data-price="6.99">Add to Basket</button>
+                    <button class="btn-benefits" data-modal="naturesBotoxModal">View Benefits</button>
+                </div>
+                <div id="naturesBotoxModal" class="modal">
+                    <div class="modal-content">
+                        <span class="close" onclick="closeModal('naturesBotoxModal')">&times;</span>
+                        <h4>Nature's Botox Benefits:</h4>
+                        <ul>
+                            <li><i class="fas fa-lemon"></i> Rich in Vitamin A</li>
+                            <li><i class="fas fa-heartbeat"></i> Supports collagen production</li>
+                            <li><i class="fas fa-clock"></i> Anti-aging qualities</li>
+                            <li><i class="fas fa-pills"></i> Anti-inflammatory and antioxidant properties</li>
+                            <li><i class="fas fa-spray-can"></i> Soothes and calms irritated skin</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SINGLE Checkout Modal -->
+    <div id="checkout-modal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('checkout-modal')">&times;</span>
+
+            <div class="progress-bar">
+                <div class="step active">1. Basket</div>
+                <div class="step">2. Details</div>
+                <div class="step">3. Payment</div>
+                <div class="step">4. Confirm</div>
+            </div>
+
+            <div class="checkout-step" id="step-basket">
+                <h2>Your Basket</h2>
+                <ul id="checkout-cart-items"></ul>
+                <p>Total: <span id="checkout-total">£0.00</span></p>
+                <button class="next-step">Continue to Details</button>
+            </div>
+
+            <div class="checkout-step" id="step-details" style="display:none;">
+                <h2>Enter Your Details</h2>
+                <input type="text" id="checkout-name" placeholder="Full Name" required />
+                <input type="email" id="checkout-email" placeholder="Email" required />
+                <input type="text" id="address-line1" placeholder="Address Line 1" required />
+                <input type="text" id="address-line2" placeholder="Address Line 2 (optional)" />
+                <input type="text" id="postcode" placeholder="Postcode" required />
+                <input type="text" id="country" placeholder="Country" required />
+                <button class="prev-step">Back</button>
+                <button class="next-step">Continue to Payment</button>
+            </div>
+
+            <div class="checkout-step" id="step-payment" style="display:none;">
+                <h2>Payment</h2>
+                <form id="checkout-form">
+                    <div id="card-element"></div>
+                    <div id="card-errors"></div>
+                    <button type="submit">Pay Now</button>
+                </form>
+                <button class="prev-step">Back</button>
+            </div>
+
+            <div class="checkout-step" id="step-confirm" style="display:none;">
+                <h2>Order Confirmation</h2>
+                <p><strong>Name:</strong> <span id="confirm-name"></span></p>
+                <p><strong>Email:</strong> <span id="confirm-email"></span></p>
+                <p><strong>Address:</strong> <span id="confirm-address"></span></p>
+                <p><strong>Total:</strong> <span id="confirm-total"></span></p>
+                <button class="prev-step">Back</button>
+                <button id="place-order-btn" class="btn">Place Order</button>
+            </div>
+        </div>
+    </div>
+
+    <section id="contact" class="contact">
+        <h2>Contact Us</h2>
+        <p>Have a question or want to learn more? We'd love to hear from you!</p>
+        <form id="contact-form">
+            <input type="text" id="contact-name" placeholder="Your Name" required>
+            <input type="email" id="contact-email" placeholder="Your Email" required>
+            <textarea id="contact-message" placeholder="Your Message" required></textarea>
+            <button type="submit">Send Message</button>
+        </form>
+        <div id="contact-success" style="display:none; margin-top: 1rem; color: green; font-weight: bold;">
+            Thank you! Your message has been sent. 💌
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2025 NuruSoaps - Nurtured by Nature, Crafted by Hand</p>
+    </footer>
+
+    <script src="https://js.stripe.com/v3/"></script>
+    <script src="script.js"></script>
+</body>
+</html>

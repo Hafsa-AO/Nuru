@@ -1,0 +1,17 @@
+# Ignore environment variables
+.env
+
+# Ignore node_modules in both frontend and backend
+node_modules/
+frontendNS/node_modules/
+backendNS/node_modules/
+
+# Ignore package-lock.json in frontend and backend (if you don't want to track them)
+frontendNS/package-lock.json
+backendNS/package-lock.json
+
+# You may also add any build folders if they exist
+# frontendNS/build/
+
+
+

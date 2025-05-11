@@ -92,19 +92,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.querySelectorAll('.add-to-cart').forEach(button => {
         button.addEventListener('click', function () {
-            const productId = this.getAttribute('data-product-id');
+            const productId = this.getAttribute('data-product-id'); // Capture product ID
             const name = this.getAttribute('data-product');
             const price = parseFloat(this.getAttribute('data-price'));
     
-            // Check if item is already in cart
-            let existingItem = cart.find(item => item.productId === productId);
-            if (existingItem) {
-                existingItem.quantity += 1;
+            if (productId && name && price) { // Check if these values are correctly fetched
+                cart.push({ productId: parseInt(productId), name, price, quantity: 1 });
+                console.log(cart); // Log cart to check if data is correct
             } else {
-                cart.push({ productId, name, price, quantity: 1 });
+                console.error('Invalid product data:', productId, name, price);
             }
     
-            // Update cart count (total number of individual items)
             cartCount++;
             const cartCountElement = document.getElementById('cart-count');
             if (cartCountElement) cartCountElement.innerText = cartCount;

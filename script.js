@@ -119,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Stripe PaymentIntent flow
     document.getElementById('checkout-form').addEventListener('submit', async (e) => {
         e.preventDefault();
-
+        try {
         const name = document.getElementById('checkout-name').value.trim();
         const email = document.getElementById('checkout-email').value.trim();
         const address1 = document.getElementById('address-line1').value.trim();
@@ -134,7 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
             body: JSON.stringify({ 
                 amount: Math.round(totalAmount * 100), 
                 name,
-                email 
+                email
             })
         });
         

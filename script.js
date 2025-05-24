@@ -130,17 +130,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             // Step 1: Create PaymentIntent on server
-            const paymentInitRes = await fetch('http://localhost:3000/create-payment-intent', {
+            const paymentInitRes = await fetch('https://immense-coast-77511-1be7e20913d5.herokuapp.com/create-payment-intent', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ amount: Math.round(totalAmount * 100) })
             });
-
+        
             const { clientSecret, error: initError } = await paymentInitRes.json();
             if (initError) {
                 alert('Error creating payment: ' + initError);
                 return;
             }
+        
 
             // Step 2: Confirm payment with Stripe
             const { paymentIntent, error: stripeError } = await stripe.confirmCardPayment(clientSecret, {

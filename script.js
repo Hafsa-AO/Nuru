@@ -42,7 +42,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateStepDisplay() {
-        if (document.activeElement) document.activeElement.blur();
         steps.forEach((id, index) => {
             const stepEl = document.getElementById(id);
             if (stepEl) stepEl.style.display = index === currentStep ? 'block' : 'none';
@@ -92,25 +91,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.querySelectorAll('.add-to-cart').forEach(button => {
         button.addEventListener('click', function () {
-            const productId = this.getAttribute('data-product-id'); // Capture product ID
             const name = this.getAttribute('data-product');
             const price = parseFloat(this.getAttribute('data-price'));
-    
-            if (productId && name && price) { // Check if these values are correctly fetched
-                cart.push({ productId: parseInt(productId), name, price, quantity: 1 });
-                console.log(cart); // Log cart to check if data is correct
-            } else {
-                console.error('Invalid product data:', productId, name, price);
-            }
-    
+            cart.push({ name, price });
+
             cartCount++;
             const cartCountElement = document.getElementById('cart-count');
             if (cartCountElement) cartCountElement.innerText = cartCount;
-    
+
             updateCartSummary();
         });
     });
-    
 
     document.getElementById('cart-btn').addEventListener('click', () => {
         updateCartSummary();
@@ -119,24 +110,16 @@ document.addEventListener('DOMContentLoaded', () => {
         openModal('checkout-modal');
     });
 
-    // Set up the backend URL dynamically based on the environment (local or production)
-    const backendUrl = window.location.hostname === 'localhost'
-      ? 'http://localhost:3000'
-      : 'https://immense-coast-77511-1be7e20913d5.herokuapp.com';
-
-    const paymentUrl = `${backendUrl}/create-payment`;
-    const contactUrl = `${backendUrl}/contact`;
-
     // Stripe setup
     const stripe = Stripe('pk_live_51RHr5g00vYTXWJ1EIq9khvyn8KLs0JivRf2leeY8Nw3UJ7bmij0ZSbXIWpRDwbvY1pVflP4X939Mupeu2rmdpYBC00V5qDoHV1');
     const elements = stripe.elements();
     const cardElement = elements.create('card');
     cardElement.mount('#card-element');
 
-    // Stripe form submission handler
+    // Stripe PaymentIntent flow
     document.getElementById('checkout-form').addEventListener('submit', async (e) => {
         e.preventDefault();
-
+        try {
         const name = document.getElementById('checkout-name').value.trim();
         const email = document.getElementById('checkout-email').value.trim();
         const address1 = document.getElementById('address-line1').value.trim();
@@ -145,49 +128,81 @@ document.addEventListener('DOMContentLoaded', () => {
         const country = document.getElementById('country').value.trim();
         const fullAddress = `${address1}, ${address2 ? address2 + ', ' : ''}${postcode}, ${country}`;
 
-        try {
-            const { token, error } = await stripe.createToken(cardElement);
+        const paymentInitRes = await fetch('https://immense-coast-77511-1be7e20913d5.herokuapp.com/create-payment-intent', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                amount: Math.round(totalAmount * 100), 
+                name,
+                email
+            })
+        });
+        
+            const { clientSecret, error: initError } = await paymentInitRes.json();
+            if (initError) {
+                alert('Error creating payment: ' + initError);
+                return;
+            }
+        
 
-            if (error) {
-                alert('Payment error: ' + error.message);
+            // Step 2: Confirm payment with Stripe
+            const { paymentIntent, error: stripeError } = await stripe.confirmCardPayment(clientSecret, {
+                payment_method: {
+                    card: cardElement,
+                    billing_details: {
+                        name,
+                        email,
+                        address: {
+                            line1: address1,
+                            line2: address2,
+                            postal_code: postcode,
+                            country
+                        }
+                    }
+                }
+            });
+
+            if (stripeError) {
+                alert('Payment failed: ' + stripeError.message);
                 return;
             }
 
-            const response = await fetch(paymentUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    stripe_token: token.id,
-                    name,
-                    email,
-                    address: fullAddress,
-                    cart,
-                    amount: Math.round(totalAmount * 100)
-                })
-            });
+            if (paymentIntent.status === 'succeeded') {
+                // Step 3: Finalize order
+                const finalizeRes = await fetch('http://localhost:3000/finalize-order', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name,
+                        email,
+                        address: fullAddress,
+                        cart,
+                        amount: Math.round(totalAmount * 100),
+                        paymentIntentId: paymentIntent.id
+                    })
+                });
 
-            const result = await response.json();
+                const result = await finalizeRes.json();
 
-            if (result.success) {
-                alert('Payment Successful! 🎉');
-                cart = [];
-                cartCount = 0;
-                document.getElementById('cart-count').innerText = cartCount;
-                updateCartSummary();
-
-                currentStep = 3; // Show confirmation step
-                updateStepDisplay();
-            } else {
-                alert('Payment failed: ' + result.error);
+                if (result.success) {
+                    alert('Payment Successful! 🎉');
+                    cart = [];
+                    cartCount = 0;
+                    document.getElementById('cart-count').innerText = cartCount;
+                    updateCartSummary();
+                    currentStep = 3;
+                    updateStepDisplay();
+                } else {
+                    alert('Order failed: ' + result.error);
+                }
             }
-
         } catch (err) {
-            console.error(err);
-            alert('There was an error processing your payment.');
+            console.error('Unexpected error:', err);
+            alert('Unexpected error occurred during payment.');
         }
     });
 
-    // Contact Form Logic
+    // Contact Form
     const contactForm = document.getElementById('contact-form');
     const contactSuccessDiv = document.getElementById('contact-success');
 
@@ -205,7 +220,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             try {
-                const response = await fetch(contactUrl, {
+                const response = await fetch('http://localhost:3000/contact', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ name, email, message }),
@@ -227,7 +242,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Step Navigation Buttons
+    // Step navigation
     document.querySelectorAll('.next-step').forEach(btn => btn.addEventListener('click', nextStep));
     document.querySelectorAll('.prev-step').forEach(btn => btn.addEventListener('click', prevStep));
 });

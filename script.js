@@ -157,7 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    token: token.id,
+                    stripe_token: token.id,
                     name,
                     email,
                     address: fullAddress,

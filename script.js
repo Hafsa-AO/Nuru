@@ -128,13 +128,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const country = document.getElementById('country').value.trim();
         const fullAddress = `${address1}, ${address2 ? address2 + ', ' : ''}${postcode}, ${country}`;
 
-        try {
-            // Step 1: Create PaymentIntent on server
-            const paymentInitRes = await fetch('https://immense-coast-77511-1be7e20913d5.herokuapp.com/create-payment-intent', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ amount: Math.round(totalAmount * 100) })
-            });
+        const paymentInitRes = await fetch('https://immense-coast-77511-1be7e20913d5.herokuapp.com/create-payment-intent', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                amount: Math.round(totalAmount * 100), 
+                name,
+                email 
+            })
+        });
         
             const { clientSecret, error: initError } = await paymentInitRes.json();
             if (initError) {

@@ -42,7 +42,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateStepDisplay() {
-        if (document.activeElement) document.activeElement.blur();
         steps.forEach((id, index) => {
             const stepEl = document.getElementById(id);
             if (stepEl) stepEl.style.display = index === currentStep ? 'block' : 'none';
@@ -117,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const cardElement = elements.create('card');
     cardElement.mount('#card-element');
 
-    // Stripe form submission handler
+    // Stripe PaymentIntent flow
     document.getElementById('checkout-form').addEventListener('submit', async (e) => {
         e.preventDefault();
 
@@ -130,49 +129,77 @@ document.addEventListener('DOMContentLoaded', () => {
         const fullAddress = `${address1}, ${address2 ? address2 + ', ' : ''}${postcode}, ${country}`;
 
         try {
-            const { token, error } = await stripe.createToken(cardElement);
+            // Step 1: Create PaymentIntent on server
+            const paymentInitRes = await fetch('http://localhost:3000/create-payment-intent', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ amount: Math.round(totalAmount * 100) })
+            });
 
-            if (error) {
-                alert('Payment error: ' + error.message);
+            const { clientSecret, error: initError } = await paymentInitRes.json();
+            if (initError) {
+                alert('Error creating payment: ' + initError);
                 return;
             }
 
-            const response = await fetch('http://localhost:3000/create-payment', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    token: token.id,
-                    name,
-                    email,
-                    address: fullAddress,
-                    cart,
-                    amount: Math.round(totalAmount * 100)
-
-                })
+            // Step 2: Confirm payment with Stripe
+            const { paymentIntent, error: stripeError } = await stripe.confirmCardPayment(clientSecret, {
+                payment_method: {
+                    card: cardElement,
+                    billing_details: {
+                        name,
+                        email,
+                        address: {
+                            line1: address1,
+                            line2: address2,
+                            postal_code: postcode,
+                            country
+                        }
+                    }
+                }
             });
 
-            const result = await response.json();
-
-            if (result.success) {
-                alert('Payment Successful! 🎉');
-                cart = [];
-                cartCount = 0;
-                document.getElementById('cart-count').innerText = cartCount;
-                updateCartSummary();
-
-                currentStep = 3; // Show confirmation step
-                updateStepDisplay();
-            } else {
-                alert('Payment failed: ' + result.error);
+            if (stripeError) {
+                alert('Payment failed: ' + stripeError.message);
+                return;
             }
 
+            if (paymentIntent.status === 'succeeded') {
+                // Step 3: Finalize order
+                const finalizeRes = await fetch('http://localhost:3000/finalize-order', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name,
+                        email,
+                        address: fullAddress,
+                        cart,
+                        amount: Math.round(totalAmount * 100),
+                        paymentIntentId: paymentIntent.id
+                    })
+                });
+
+                const result = await finalizeRes.json();
+
+                if (result.success) {
+                    alert('Payment Successful! 🎉');
+                    cart = [];
+                    cartCount = 0;
+                    document.getElementById('cart-count').innerText = cartCount;
+                    updateCartSummary();
+                    currentStep = 3;
+                    updateStepDisplay();
+                } else {
+                    alert('Order failed: ' + result.error);
+                }
+            }
         } catch (err) {
-            console.error(err);
-            alert('There was an error processing your payment.');
+            console.error('Unexpected error:', err);
+            alert('Unexpected error occurred during payment.');
         }
     });
 
-    // Contact Form Logic
+    // Contact Form
     const contactForm = document.getElementById('contact-form');
     const contactSuccessDiv = document.getElementById('contact-success');
 
@@ -212,9 +239,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    //  Step Navigation Buttons
+    // Step navigation
     document.querySelectorAll('.next-step').forEach(btn => btn.addEventListener('click', nextStep));
     document.querySelectorAll('.prev-step').forEach(btn => btn.addEventListener('click', prevStep));
-
-
 });
+
